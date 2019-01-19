@@ -218,11 +218,11 @@ def create_SQL_from_NGIS_bore_data(state_datainput='NSW',NGISdata_dir='',SQLdata
 if __name__=="__main__":
 
     #location to save SQL database
-    SQLdata_saveto_dir = r'G:\INF_120 Infrastructure\TECH\GEOTECHNICS\STAFF FOLDERS\Antony_Orton\python\NGISwebmaptools'
+    SQLdata_saveto_dir = '/home/antony/Python/data/NGISdata'
 
     #choose state: string one of (NSW, VIC, SA, QLD, NT, WA, ACT)
     state = 'NSW'
-    NGISdata_dir = r'G:\INF_120 Infrastructure\TECH\GEOTECHNICS\STAFF FOLDERS\Antony_Orton\python\NGISwebmaptools\databases20190117\shp_'+state
+    NGISdata_dir = '/home/antony/Python/data/NGISdata/shp_'+state
 
     
     create_SQL_from_NGIS_bore_data(state_datainput=state,NGISdata_dir=NGISdata_dir,SQLdata_saveto_dir=SQLdata_saveto_dir)
