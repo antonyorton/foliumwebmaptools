@@ -7,7 +7,7 @@ import numpy as np
 from bs4 import BeautifulSoup
 import html
 import shutil
-alt.renderers.enable('notebook')
+#alt.renderers.enable('notebook')
 
 
 def plot_table(dbmain, dbdata , idcol = 'BoreID',depthcol = 'FromDepth', datacol = 'Description', endholecol = 'BoreDepth'):
