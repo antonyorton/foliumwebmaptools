@@ -106,18 +106,18 @@ if __name__=="__main__":
 
 	database_directory=r'C:\Users\Antony.Orton\Desktop\Python_programs\foliumwebmaptools'
 	databasename='NSWBoreDatabase.db'
-	extents = [149.3653,-30.6098,150.5079,-29.7313]
+	extents = [149.774579,-30.46434,150.157727,-30.160842]
 
 	[dbmain, dblitho, dblevels] = extract_NGIS_data_from_SQL_and_extents(databasename,\
 	extents, database_directory = database_directory)
 
 	#get absolute value of depth below ground
 	dblevels['result'] = dblevels['result'].apply(lambda x: np.abs(x))
-	
+
 	#rename for section plotting tool (not needed for NGIS webmap plots)
 	#dfgeology = dblitho.copy()
 	#dfholes = dbmain.copy()
-	
+
 	#attach longitude and latitude (not needed for NGIS webmap plots)
 	#MGAzone = int(latlong_to_MGA([[0.5*(extents[0]+extents[2]),0.5*(extents[1]+extents[3])]])[0,2])
 	#dfholes['Longitude'],dfholes['Latitude'] = MGA_to_latlong(dfholes['Easting'],dfholes['Northing'],MGAzone)
