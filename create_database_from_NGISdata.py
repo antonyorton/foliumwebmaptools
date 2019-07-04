@@ -66,7 +66,7 @@ def create_SQL_from_NGIS_bore_data(state_datainput='NSW',NGISdata_dir='',SQLdata
     #read data into pandas
     print(' reading metadata ...')
     if state_datainput == 'NSW' or state_datainput == 'VIC':
-        meta = gpd.read_file('NGIS_Bores.shp')
+        meta = gpd.read_file('NGIS_Bore.shp')
     else:
         meta = gpd.read_file('NGIS_Bore.shp')
     meta = pd.DataFrame(meta)
@@ -105,8 +105,8 @@ def create_SQL_from_NGIS_bore_data(state_datainput='NSW',NGISdata_dir='',SQLdata
         #rename some columns for consistency
         meta.rename(columns={'HydroID':'BoreID','Projecti_1':'MGAzone','RefElev':'Elevation','HeightDatu':'HeightDatum'},inplace=True)
         levels.rename(columns = {'hydroid':'BoreID','bore_date':'date'},inplace=True)
-        #NOTE: litho does not need renaming for VIC
-        litho['Description'] = litho['Description'].apply(lambda s1: s1.replace('\'','&#39'))
+        #NOTE: litho does not need renaming for SA
+        litho['Description'] = litho['Description'].apply(lambda s1: str(s1).replace('\'','&#39'))
         
         levels = levels[levels['obs_point_datum']=='SWL'].copy()
     
@@ -143,7 +143,7 @@ def create_SQL_from_NGIS_bore_data(state_datainput='NSW',NGISdata_dir='',SQLdata
 
     elif state_datainput == 'WA':
 
-        #SA input data
+        #WA input data
         levels = pd.read_csv('level_WA.csv')
 
         #rename some columns for consistency
@@ -152,10 +152,33 @@ def create_SQL_from_NGIS_bore_data(state_datainput='NSW',NGISdata_dir='',SQLdata
         levels.rename(columns = {'hydroid':'BoreID','bore_date':'date'},inplace=True)
         #NOTE: litho does not need renaming for WA
         
-        levels = levels[levels['obs_point_datum']=='SWL'].copy()
+        
+    elif state_datainput == 'ACT':
+
+        #ACT input data
+        levels = pd.read_csv('level_ACT.csv')
+
+        #rename some columns for consistency
+        meta.rename(columns={'HydroID':'BoreID','Projecti_1':'MGAzone','RefElev':'Elevation','HeightDatu':'HeightDatum',\
+        'BoreDepth':'BDnot_used','DrilledDep':'BoreDepth'},inplace=True)
+        levels.rename(columns = {'hydroid':'BoreID','bore_date':'date'},inplace=True)
+        #NOTE: litho does not need renaming for ACT
+        litho['Description'] = litho['Description'].apply(lambda s1: s1.replace('\'','&#39'))
         
 
+    elif state_datainput == 'TAS':
 
+        #TAS input data
+        levels = pd.read_csv('level_TAS.csv')
+
+        #rename some columns for consistency
+        meta.rename(columns={'HydroID':'BoreID','Projecti_1':'MGAzone','RefElev':'Elevation','HeightDatu':'HeightDatum',\
+        'BoreDepth':'BDnot_used','DrilledDep':'BoreDepth'},inplace=True)
+        levels.rename(columns = {'hydroid':'BoreID','bore_date':'date'},inplace=True)
+        #NOTE: litho does not need renaming for TAS
+        litho['Description'] = litho['Description'].apply(lambda s1: s1.replace('\'','&#39'))
+    
+    
     
     #### This part should be the same for all states in Australia
 
@@ -168,7 +191,7 @@ def create_SQL_from_NGIS_bore_data(state_datainput='NSW',NGISdata_dir='',SQLdata
     #create SQl connection  - creates new file if database exists (instead of overwriting)
 
     if database_filename in os.listdir():
-        print('WARNING: Database named '+database_filename+ ' already exists
+        print('WARNING: Database named '+database_filename+ ' already exists')
         print('....  creating new_'+database_filename)
         database_filename = 'new_'+database_filename
 
@@ -195,11 +218,11 @@ def create_SQL_from_NGIS_bore_data(state_datainput='NSW',NGISdata_dir='',SQLdata
 if __name__=="__main__":
 
     #location to save SQL database
-    SQLdata_saveto_dir = 'C:\\Users\\A_Orton\\Desktop\\python_codes\\3_Webmap_generator'
+    SQLdata_saveto_dir = r'C:\Users\Antony.Orton\Desktop\Python_programs\foliumwebmaptools'
 
     #choose state: string one of (NSW, VIC, SA, QLD, NT, WA, ACT)
-    state = 'WA'
-    NGISdata_dir = 'C:\\Users\\A_Orton\\Desktop\\python_codes\\3_Webmap_generator\\example_databases\\'+state
+    state = 'NSW'
+    NGISdata_dir = r'C:\Users\Antony.Orton\Desktop\Python_programs\foliumwebmaptools\databases\shp_'+state
 
     
     create_SQL_from_NGIS_bore_data(state_datainput=state,NGISdata_dir=NGISdata_dir,SQLdata_saveto_dir=SQLdata_saveto_dir)

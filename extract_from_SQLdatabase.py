@@ -3,6 +3,7 @@ import sqlite3
 import pandas as pd
 import numpy as np
 import os
+import pyproj
 
 #Extract lithography and gwlevels into pandas dataframes from specified extents
 def extract_NGIS_data_from_SQL_and_extents(databasename, extents, database_directory = ''):
@@ -41,28 +42,100 @@ def extract_NGIS_data_from_SQL_and_extents(databasename, extents, database_direc
     return [dbmain, dblitho, dblevels]
 
 
+def latlong_to_MGA(Lon_Lat):
+    """Transforms from long_Lat to MGA94
+    
+    INPUT:
+    Lon_Lat: 2d array-like of longitudes (col1) and latitude (col2)
+    
+    RETURNS:    
+    array:  column 1: Easting, 2: Northing, 3: MGAzone
+    
+        """
+        
+    Lon_Lat=np.array(Lon_Lat)
+    MGA=np.zeros((np.shape(Lon_Lat)[0],3))
+    
+    wgs84=pyproj.Proj('+init=EPSG:4326')
+    
+    for i in range(len(Lon_Lat)):
+        zone=int(Lon_Lat[i,0]/6)+31
+        mga94=pyproj.Proj('+init=EPSG:283'+str(zone))  
+        x,y=pyproj.transform(wgs84,mga94,Lon_Lat[i,0],Lon_Lat[i,1]) #convert to mga94
+        MGA[i,0]=x
+        MGA[i,1]=y
+        MGA[i,2]=zone
+        
+    return MGA
+    
+    
+def MGA_to_latlong(eastings,northings,MGAzone):
+    """ get latlong from MGA coords
+    
+    INPUT:
+    eastings: 1D array-like, eastings coordinates
+    northings: 1D array-like northings coordinates
+    MGAzone: (integer) Australian MGAzone (49,50,51,52,53,54,55 or 56)
+
+    RETURNS: 
+    A 2-tuple, 1. Longitudes 2. Latitudes
+          
+        """
+    
+    if type(eastings) == pd.DataFrame or type(eastings) == pd.Series:
+        eastings = np.array(eastings)
+    
+    if type(northings) == pd.DataFrame or type(northings) == pd.Series:
+        northings = np.array(northings)
+    
+    
+    if not int(MGAzone) in np.arange(49,57):
+        raise ValueError('Error: MGA zone must be between 49 and 56')
+    
+    wgs84=pyproj.Proj('+init=EPSG:4326')
+    mga94=pyproj.Proj('+init=EPSG:283'+str(MGAzone))
+
+    longitude,latitude = pyproj.transform(mga94,wgs84,eastings,northings) #convert to mga94
+
+    return (longitude,latitude)
+
+	
+	
+	
 if __name__=="__main__":
 
+
     # get extents from https://boundingbox.klokantech.com/
-    
+
     database_directory='C:\\Users\\A_Orton\\Desktop\\python_codes\\3_Webmap_generator'
     databasename='NSWBoreDatabase.db'
     extents = [151.7477175091,-32.2220046343,152.0792653655,-31.8812531779]
 
+
+
     [dbmain, dblitho, dblevels] = extract_NGIS_data_from_SQL_and_extents(databasename,\
     extents, database_directory = database_directory)
-        
 
-    #rename for section plotting tool
-    dfgeology = dblitho.copy()
-    dfholes = dbmain.copy()
+    #get absolute value of depth below ground
+    dblevels['result'] = dblevels['result'].apply(lambda x: np.abs(x))
+          
+    #rename for section plotting tool (not needed for NGIS webmap plots)
+    #dfgeology = dblitho.copy()
+    #dfholes = dbmain.copy()
 
-    dfgeology.rename(columns = {'BoreID':'borehole', 'FromDepth':'fromDepth', 'MajorLithCode':'material'},inplace=True)
-    dfholes.rename(columns={'BoreID':'borehole','Easting':'x','Northing':'y','Elevation':'top_rl','BoreDepth':'EOH_depth'},inplace=True)            
+    #attach longitude and latitude (not needed for NGIS webmap plots)
+    #MGAzone = int(latlong_to_MGA([[0.5*(extents[0]+extents[2]),0.5*(extents[1]+extents[3])]])[0,2])
+    #dfholes['Longitude'],dfholes['Latitude'] = MGA_to_latlong(dfholes['Easting'],dfholes['Northing'],MGAzone)
+
+    #Rename and extract certain columns only (not needed for NGIS webmap plots)
+    #dfgeology.rename(columns = {'BoreID':'borehole', 'FromDepth':'fromDepth', 'MajorLithCode':'material'},inplace=True)
+    #dfholes.rename(columns={'BoreID':'borehole','Easting':'x','Northing':'y','Elevation':'top_rl','BoreDepth':'EOH_depth'},inplace=True)            
     #dfholes = dfholes[['borehole','x','y','top_rl','EOH_depth']].copy()
     #dfholes['dip']=-90
     #dfholes['dip_direction']=0
-    dfgeology = dfgeology[['borehole','fromDepth','material']].copy()
-    
-    dblevels['result'] = dblevels['result'].apply(lambda x: np.abs(x))
+    #dfgeology = dfgeology[['borehole','fromDepth','material']].copy()
+
+	
+	
+
 
