@@ -1,6 +1,7 @@
 """script to extract out data from a given SQL NGIS bore database within specified extents"""
 import sqlite3
 import pandas as pd
+import numpy as np
 import os
 
 #Extract lithography and gwlevels into pandas dataframes from specified extents
@@ -42,9 +43,11 @@ def extract_NGIS_data_from_SQL_and_extents(databasename, extents, database_direc
 
 if __name__=="__main__":
 
+    # get extents from https://boundingbox.klokantech.com/
+    
     database_directory='C:\\Users\\A_Orton\\Desktop\\python_codes\\3_Webmap_generator'
-    databasename='SABoreDatabase.db'
-    extents = [137.0936,-33.0198,137.8132,-32.4005]
+    databasename='NSWBoreDatabase.db'
+    extents = [151.7477175091,-32.2220046343,152.0792653655,-31.8812531779]
 
     [dbmain, dblitho, dblevels] = extract_NGIS_data_from_SQL_and_extents(databasename,\
     extents, database_directory = database_directory)
@@ -56,9 +59,9 @@ if __name__=="__main__":
 
     dfgeology.rename(columns = {'BoreID':'borehole', 'FromDepth':'fromDepth', 'MajorLithCode':'material'},inplace=True)
     dfholes.rename(columns={'BoreID':'borehole','Easting':'x','Northing':'y','Elevation':'top_rl','BoreDepth':'EOH_depth'},inplace=True)            
-    dfholes = dfholes[['borehole','x','y','top_rl','EOH_depth']].copy()
-    dfholes['dip']=-90
-    dfholes['dip_direction']=0
+    #dfholes = dfholes[['borehole','x','y','top_rl','EOH_depth']].copy()
+    #dfholes['dip']=-90
+    #dfholes['dip_direction']=0
     dfgeology = dfgeology[['borehole','fromDepth','material']].copy()
     
     dblevels['result'] = dblevels['result'].apply(lambda x: np.abs(x))
