@@ -5,6 +5,7 @@ import altair as alt
 import pandas as pd
 import numpy as np
 from bs4 import BeautifulSoup
+import altair as alt
 import html
 import shutil
 alt.renderers.enable('notebook')
@@ -17,10 +18,32 @@ def plot_table(dbmain, dbdata , idcol = 'BoreID',depthcol = 'FromDepth', datacol
     dbdata: dataframe with data (specified in depthcol and datacol)
     datacol: string or list of column names from dbdata to plot against depthcol
     """
+
+    print('Basemap options can be found here:  https://leaflet-extras.github.io/leaflet-providers/preview/')
+
+    ###Open Street Map
+    tiles = 'OpenStreetMap'
+    attr = ''
+    
+    ###ESRI Sattelite
+    #attr = ('&copy; <a href="http://www.esri.com/">Esri</a>, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community')
+    #tiles = 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+
+    ###ESRI World topo
+    #tiles = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}'
+    #attr = ('Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community')
+
+    ###GOOGLE hybrid (does not work until attribution is found)
+    #tiles = 'http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}'  #Google hybrid
     
     centro = [dbmain['Latitude'].mean(),dbmain['Longitude'].mean()]
-    map = folium.Map(location= centro,tiles = 'OpenStreetMap',zoom_start=12)
+    
+    #map = folium.Map(location= centro,tiles = 'OpenStreetMap',zoom_start=12)
+    map = folium.Map(location= centro,tiles = tiles,attr = attr,zoom_start=12)
+    
 
+    
+    
     bores = list(dbdata[idcol].drop_duplicates())
     
     for i in range(len(bores)):
@@ -109,6 +132,8 @@ def plot_timecharts(dbmain, dbdata , idcol = 'BoreID',datecol = 'date', ycol = '
             popup=folium.Popup(h1)
         else:    #else display value only
             popup = str(s1)
+        
+      
         folium.Marker(location=[latitude1,longitude1],popup=popup).add_to(map)              
         print(i)        
 
