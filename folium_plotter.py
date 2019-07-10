@@ -1,5 +1,6 @@
 import folium
 from folium import Element, Html
+from folium.plugins import MarkerCluster
 import folium.plugins as fp
 import altair as alt
 import pandas as pd
@@ -21,14 +22,15 @@ def plot_table(dbmain, dbdata , idcol = 'BoreID',depthcol = 'FromDepth', datacol
     """
 
     print('Basemap options can be found here:  https://leaflet-extras.github.io/leaflet-providers/preview/')
-
+    print('Marker options can be found here: https://fontawesome.com')
+    
     ###Open Street Map
-    tiles = 'OpenStreetMap'
-    attr = ''
+    #tiles = 'OpenStreetMap'
+    #attr = ''
     
     ###ESRI Sattelite
-    #attr = ('&copy; <a href="http://www.esri.com/">Esri</a>, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community')
-    #tiles = 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+    attr = ('&copy; <a href="http://www.esri.com/">Esri</a>, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community')
+    tiles = 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 
     ###ESRI World topo
     #tiles = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}'
@@ -40,8 +42,8 @@ def plot_table(dbmain, dbdata , idcol = 'BoreID',depthcol = 'FromDepth', datacol
     centro = [dbmain['Latitude'].mean(),dbmain['Longitude'].mean()]
     
     #map = folium.Map(location= centro,tiles = 'OpenStreetMap',zoom_start=12)
-    map = folium.Map(location= centro,tiles = tiles,attr = attr,zoom_start=12)
-    
+    map = folium.Map(location= centro,tiles = tiles,attr = attr,zoom_start=12,max_zoom=19)
+    my_cluster = MarkerCluster(disableClusteringAtZoom=17).add_to(map)
 
     
     
@@ -67,7 +69,10 @@ def plot_table(dbmain, dbdata , idcol = 'BoreID',depthcol = 'FromDepth', datacol
             
             #popup=folium.Popup(html = Html(lithodata.to_html))
             popup=folium.Popup('<b>'+'bore:  </b>'+str(bores[i])+'<b>'+'       EOH(m): </b>'+str(endofhole)[0:5]+'<br>'+lithodata.iloc[0:25].to_html(index = False))
-            folium.Marker(location=[latitude1,longitude1],popup=popup).add_to(map)              
+            
+            
+            #folium.Marker(location=[latitude1,longitude1],popup=popup).add_to(map) 
+            folium.Marker(location=[latitude1,longitude1],popup=popup,icon=folium.Icon(icon='info-sign',color='red')).add_to(my_cluster)
             if np.mod(i,5)==0: 
                 print(i)
         
@@ -149,9 +154,9 @@ if __name__=="__main__":
 	plot_litho_tables = True
 	plot_gwl_timeseries = False
 	
-	database_directory=r'C:\Users\Antony.Orton\Desktop\Python_programs\foliumwebmaptools'
+	database_directory=r'C:\Users\A_Orton\Desktop\python_codes\3_Webmap_generator' #directiory in which the .db files reside
 	databasename='NSWBoreDatabase.db'
-	extents = [149.774319,-30.975927,150.337368,-30.2289]
+	extents = [151.170142,-33.936934,151.201633,-33.912293]
 	#END OF INPUT
 	
 	
