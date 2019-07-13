@@ -68,12 +68,14 @@ def plot_table(dbmain, dbdata , idcol = 'BoreID',depthcol = 'FromDepth', datacol
             latitude1=float(dbmain[dbmain[idcol]==bores[i]]['Latitude'])
             
             #popup=folium.Popup(html = Html(lithodata.to_html))
-            popup=folium.Popup('<b>'+'bore:  </b>'+str(bores[i])+'<b>'+'       EOH(m): </b>'+str(endofhole)[0:5]+'<br>'+lithodata.iloc[0:25].to_html(index = False))
+            popup=folium.Popup('<b>'+'Bore:  </b>'+str(bores[i])+'<b>'+'       EOH(m): </b>'+str(endofhole)[0:5]+\
+			'<br><b>'+'Loc: </b>'+str(longitude1)+','+str(latitude1)+'<br>'+lithodata.iloc[0:25].to_html(index = False),\
+			max_width=350,min_width=200)
             
             
             #folium.Marker(location=[latitude1,longitude1],popup=popup).add_to(map) 
             folium.Marker(location=[latitude1,longitude1],popup=popup,icon=folium.Icon(icon='info-sign',color='red')).add_to(my_cluster)
-            if np.mod(i,5)==0: 
+            if np.mod(i,100)==0: 
                 print(i)
         
     map.save('tester2.html')    
@@ -131,16 +133,20 @@ def plot_timecharts(dbmain, dbdata , idcol = 'BoreID',datecol = 'date', ycol = '
 		'<b>Bore: </b>'+str(bores[i])+\
 		'<br><b>Depth to groundwater = </b>'+str(levdata.sort_values(datecol).iloc[-1][ycol])+' m'\
 		'<br><b>Date: </b>'+str(levdata.sort_values(datecol).iloc[-1][datecol])+\
-		'<br><b>Bore depth: </b>'+str(endofhole)+' m<br>'
+		'<br><b>Bore depth: </b>'+str(endofhole)+' m'+\
+		'<br><b>Loc: </b>'+str(longitude1)+','+str(latitude1)+'<br>'
 		if len(levdata)>1:  #plot chart if more than on reading - string to popup html file (from disk) to new window with specified size
 			#htmlstring = """<a href="#" target="_blank" onClick="window.open('C:/Users/A_Orton/Desktop/python_codes/1_DEM_plotting_and_section/ARUP_version_testing/images/well"""+str(i)+""".html','pagename','resizable,height=400,width=520'); return false;">Groundwater plot</a>"""
 			htmlstring = """<a href="#" target="_blank" onClick="window.open('WMPtt18images/"""+str(bores[i])+""".html','pagename','resizable,height=400,width=520'); return false;">Groundwater plot</a>"""
 			h1=Html(s1+htmlstring.replace('\'','&#39'),script=True) #Critical to remove single quotes from the string by replacing \' with &#39
-			popup=folium.Popup(h1)
+			popup=folium.Popup(h1,max_width=350,min_width=200)
 		else:    #else display value only
-			popup = str(s1)
+			popup = folium.Popup(str(s1),max_width=350,min_width=200)
 		folium.Marker(location=[latitude1,longitude1],popup=popup).add_to(map)              
-		print(i)        
+		
+		if np.mod(i,100)==0: 
+			print(i)
+       
 
 	map.save('tester1.html')
 
@@ -149,14 +155,15 @@ def plot_timecharts(dbmain, dbdata , idcol = 'BoreID',datecol = 'date', ycol = '
 if __name__=="__main__":
 
 	import extract_from_SQLdatabase as extmain
+	#import create_database_from_NGISdata as crt
 	
 	#INPUT
 	plot_litho_tables = True
 	plot_gwl_timeseries = False
 	
-	database_directory=r'C:\Users\A_Orton\Desktop\python_codes\3_Webmap_generator' #directiory in which the .db files reside
+	database_directory=r'C:\Users\Antony.Orton\Desktop\Python_programs\foliumwebmaptools' #directiory in which the .db files reside
 	databasename='NSWBoreDatabase.db'
-	extents = [151.170142,-33.936934,151.201633,-33.912293]
+	extents = [149.9745,-34.5219,152.2928,-32.4013]
 	#END OF INPUT
 	
 	
@@ -169,6 +176,11 @@ if __name__=="__main__":
     
 	dblevels['date'] = pd.to_datetime(dblevels['date'])
 	dblevels = dblevels.sort_values('date')
+	
+	dblitho.loc[dblitho['FromDepth']=='None','FromDepth']=-999.99 #Fixup
+	dblitho.fillna(value=str('not recorded'),inplace=True) #Need to think of better method here
+	dblitho['Description']=dblitho['Description'].apply(lambda x: ''.join([s for s in x if (s.isalnum() or s==' ')]).upper()) #fix bad (non alphanumeric) strings
+
 	
 	if plot_litho_tables:
 		plot_table(dbmain,dblitho)

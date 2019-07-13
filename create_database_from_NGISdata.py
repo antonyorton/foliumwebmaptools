@@ -209,7 +209,7 @@ def create_SQL_from_NGIS_bore_data(state_datainput='NSW',NGISdata_dir='',SQLdata
     print(['BoreID','FromDepth','MajorLithCode','Description'])
 
     print('done. \n creating SQL table - gwlevels ...')
-    levels[['BoreID','date','obs_point_datum','result']] .to_sql('gwlevels',conn)     
+    levels[['BoreID','date','obs_point_datum','result']].to_sql('gwlevels',conn)     
     print(['BoreID','date','obs_point_datum','result'])
 
     conn.commit()
