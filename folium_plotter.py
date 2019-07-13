@@ -25,12 +25,12 @@ def plot_table(dbmain, dbdata , idcol = 'BoreID',depthcol = 'FromDepth', datacol
     print('Marker options can be found here: https://fontawesome.com')
     
     ###Open Street Map
-    #tiles = 'OpenStreetMap'
-    #attr = ''
+    tiles = 'OpenStreetMap'
+    attr = ''
     
     ###ESRI Sattelite
-    attr = ('&copy; <a href="http://www.esri.com/">Esri</a>, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community')
-    tiles = 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+    #attr = ('&copy; <a href="http://www.esri.com/">Esri</a>, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community')
+    #tiles = 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 
     ###ESRI World topo
     #tiles = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}'
@@ -101,8 +101,9 @@ def plot_timecharts(dbmain, dbdata , idcol = 'BoreID',datecol = 'date', ycol = '
 	os.makedirs('WMPtt18images')
 
 	centro = [dbmain['Latitude'].mean(),dbmain['Longitude'].mean()]
-	map = folium.Map(location= centro,tiles = 'OpenStreetMap',zoom_start=12)
-
+	map = folium.Map(location= centro,tiles = 'OpenStreetMap',zoom_start=12,max_zoom=19)
+	my_cluster = MarkerCluster(disableClusteringAtZoom=17).add_to(map)
+	
 	bores = list(dbdata[idcol].drop_duplicates())
 
 	for i in range(len(bores)):
@@ -142,7 +143,7 @@ def plot_timecharts(dbmain, dbdata , idcol = 'BoreID',datecol = 'date', ycol = '
 			popup=folium.Popup(h1,max_width=350,min_width=200)
 		else:    #else display value only
 			popup = folium.Popup(str(s1),max_width=350,min_width=200)
-		folium.Marker(location=[latitude1,longitude1],popup=popup).add_to(map)              
+		folium.Marker(location=[latitude1,longitude1],popup=popup,icon=folium.Icon(icon='info-sign',color='blue')).add_to(my_cluster)              
 		
 		if np.mod(i,100)==0: 
 			print(i)
@@ -158,12 +159,12 @@ if __name__=="__main__":
 	#import create_database_from_NGISdata as crt
 	
 	#INPUT
-	plot_litho_tables = True
-	plot_gwl_timeseries = False
+	plot_litho_tables = False
+	plot_gwl_timeseries = True
 	
 	database_directory=r'C:\Users\Antony.Orton\Desktop\Python_programs\foliumwebmaptools' #directiory in which the .db files reside
 	databasename='NSWBoreDatabase.db'
-	extents = [149.9745,-34.5219,152.2928,-32.4013]
+	extents = [146.83,-37.91,153.84,-28.27]
 	#END OF INPUT
 	
 	
