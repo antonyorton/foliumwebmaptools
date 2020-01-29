@@ -78,9 +78,6 @@ def plot_table(dbmain, dbdata , idcol = 'BoreID',depthcol = 'FromDepth', datacol
         
     map.save('tester2.html')    
     
-    
-
-
 
 def plot_timecharts(dbmain, dbdata , idcol = 'BoreID',datecol = 'date', ycol = 'result', max_depth = 30, endholecol = 'BoreDepth'):
 
@@ -152,11 +149,11 @@ if __name__=="__main__":
 	
 	#INPUT
 	plot_litho_tables = True
-	plot_gwl_timeseries = False
+	plot_gwl_timeseries = True
 	
 	database_directory=r'C:\Users\A_Orton\Desktop\python_codes\3_Webmap_generator' #directiory in which the .db files reside
 	databasename='NSWBoreDatabase.db'
-	extents = [151.170142,-33.936934,151.201633,-33.912293]
+	extents = [151.131797,-33.440765,151.319761,-33.338318]
 	#END OF INPUT
 	
 	
