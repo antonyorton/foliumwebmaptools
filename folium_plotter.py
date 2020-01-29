@@ -159,12 +159,12 @@ if __name__=="__main__":
 	#import create_database_from_NGISdata as crt
 	
 	#INPUT
-	plot_litho_tables = False
-	plot_gwl_timeseries = True
+	plot_litho_tables = True
+	plot_gwl_timeseries = False
 	
 	database_directory=r'C:\Users\Antony.Orton\Desktop\Python_programs\foliumwebmaptools' #directiory in which the .db files reside
 	databasename='NSWBoreDatabase.db'
-	extents = [146.83,-37.91,153.84,-28.27]
+	extents = [147.24635,-33.746306,147.610272,-33.506172]
 	#END OF INPUT
 	
 	
@@ -178,10 +178,13 @@ if __name__=="__main__":
 	dblevels['date'] = pd.to_datetime(dblevels['date'])
 	dblevels = dblevels.sort_values('date')
 	
-	dblitho.loc[dblitho['FromDepth']=='None','FromDepth']=-999.99 #Fixup
+	#dblitho.loc[dblitho['FromDepth']=='None','FromDepth']=-999.99 #Fixup
 	dblitho.fillna(value=str('not recorded'),inplace=True) #Need to think of better method here
 	dblitho['Description']=dblitho['Description'].apply(lambda x: ''.join([s for s in x if (s.isalnum() or s==' ')]).upper()) #fix bad (non alphanumeric) strings
 
+	dbmain.to_csv('test_main.csv',index=False)
+	dblevels.to_csv('test_levels.csv',index=False)
+	dblitho.to_csv('test_litho.csv',index=False)
 	
 	if plot_litho_tables:
 		plot_table(dbmain,dblitho)

@@ -107,13 +107,13 @@ if __name__=="__main__":
 
     # get extents from https://boundingbox.klokantech.com/
 
-    database_directory='C:\\Users\\A_Orton\\Desktop\\python_codes\\3_Webmap_generator'
-    databasename='NSWBoreDatabase.db'
-    extents = [151.7477175091,-32.2220046343,152.0792653655,-31.8812531779]
+    database_directory=r'C:\Users\Antony.Orton\Desktop\Python_programs\foliumwebmaptools' #directiory in which the .db files reside
+    databasename='SABoreDatabase.db'
+    extents = [137.517475,-32.731474,137.799181,-32.456412]
 
 
 
-    [dbmain, dblitho, dblevels] = extract_NGIS_data_from_SQL_and_extents(databasename,\
+    [dbmain, dblitho, dblevels] = ext.extract_NGIS_data_from_SQL_and_extents(databasename,\
     extents, database_directory = database_directory)
 
     #get absolute value of depth below ground

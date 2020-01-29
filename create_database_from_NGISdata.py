@@ -198,12 +198,17 @@ def create_SQL_from_NGIS_bore_data(state_datainput='NSW',NGISdata_dir='',SQLdata
     conn = sqlite3.connect(database_filename)
 
     print(' creating SQL table - main ...')   
-    meta[['BoreID','Longitude','Latitude','Easting','Northing','MGAzone',\
-            'Elevation','HeightDatum','BoreDepth','Status']].to_sql('main',conn)
-    print (['BoreID','Longitude','Latitude','Easting','Northing','MGAzone',\
-            'Elevation','HeightDatum','BoreDepth','Status'])
+    ####Condensed table only
+	#meta[['BoreID','Longitude','Latitude','Easting','Northing','MGAzone',\
+    #        'Elevation','HeightDatum','BoreDepth','Status']].to_sql('main',conn)
+    #print (['BoreID','Longitude','Latitude','Easting','Northing','MGAzone',\
+    #        'Elevation','HeightDatum','BoreDepth','Status'])
             
-            
+	####full meta table
+    meta[list(meta)[0:-1]].to_sql('main',conn) #avoids adding the last column ('geometry') which causes sql issue
+	
+	
+	
     print('done. \n creating SQL table - lithology ...')
     litho[['BoreID','FromDepth','MajorLithCode','Description']].to_sql('lithology',conn)        
     print(['BoreID','FromDepth','MajorLithCode','Description'])
@@ -221,7 +226,7 @@ if __name__=="__main__":
     SQLdata_saveto_dir = r'C:\Users\Antony.Orton\Desktop\Python_programs\foliumwebmaptools'
 
     #choose state: string one of (NSW, VIC, SA, QLD, NT, WA, ACT)
-    state = 'NSW'
+    state = 'SA'
     NGISdata_dir = r'C:\Users\Antony.Orton\Desktop\Python_programs\foliumwebmaptools\databases\shp_'+state
 
     
